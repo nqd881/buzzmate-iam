@@ -9,7 +9,7 @@ export class RegisterUserCommand extends Command {
   public readonly username: string;
   public readonly password: string;
   public readonly emailAddress: string;
-  public readonly phoneNumber: string;
+  public readonly phoneNumber?: string;
 
   constructor(props: CommandProps<RegisterUserCommand>) {
     super(props);

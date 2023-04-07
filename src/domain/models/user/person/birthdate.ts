@@ -11,7 +11,7 @@ export class BirthDate extends ValueObject<IBirthDateProps> {
     super(props);
   }
 
-  validate() {}
+  protected validate(props: ValueObjectProps<IBirthDateProps>) {}
 
   get date() {
     return this.props.date;

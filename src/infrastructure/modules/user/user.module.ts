@@ -1,9 +1,10 @@
+import {EmitUserActivatedEvent} from "@application/domain-event-handlers/emit--user-activated-event";
 import {Module, Provider} from "@nestjs/common";
 import {CqrsModule} from "@nestjs/cqrs";
 import {RegisterUserService} from "src/application/commands/user/register-user/register-user.service";
 import {UpdatePersonalInfoService} from "src/application/commands/user/update-personal-info/update-personal-info.service";
 import {VerifyEmailService} from "src/application/commands/user/verify-email/verify-email.service";
-import {SendUserRegistrationVerificationEmail} from "src/application/event-handlers/send-user-registration-verification-email";
+import {SendUserRegistrationVerificationEmail} from "@application/domain-event-handlers/send-user-registration-verification-email";
 import {EmailModule} from "../extra-modules/email/email.module";
 import {RepoRegistryModule} from "../extra-modules/repo-registry/repo-registry.module";
 import {VerificationTokenModule} from "../extra-modules/verification-token/verification-token.module";
@@ -17,7 +18,10 @@ const commandHandlers: Provider[] = [
   UpdatePersonalInfoService,
 ];
 
-const eventHandlers: Provider[] = [SendUserRegistrationVerificationEmail];
+const eventHandlers: Provider[] = [
+  SendUserRegistrationVerificationEmail,
+  EmitUserActivatedEvent,
+];
 
 const httpControllers = [
   UserRegistrationController,

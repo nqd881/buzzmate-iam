@@ -62,8 +62,8 @@ export class VCode extends AggregateRoot<VCodeId, VCodeProps> {
   protected _attemptCount: number;
   protected _expiredAt: number;
 
-  constructor(props: VCodeProps, id?: VCodeId) {
-    super(props, id);
+  constructor(props: VCodeProps, version: number, id?: VCodeId) {
+    super(props, version, id);
   }
 
   protected init() {

@@ -1,6 +1,6 @@
+import {DOMAIN_EVENT_BUS} from "@application/di-tokens/domain-event-bus";
 import {EmailAddress, PhoneNumber, User} from "@domain/models";
-import {IUserRepo} from "@domain/repository/user-repo.interface";
-import {DOMAIN_EVENT_BUS} from "src/infrastructure/modules/extra-modules/repo-registry/constants/domain-event-bus";
+import {IUserRepo} from "@domain/models/user/user-repo.interface";
 import {Inject, Injectable} from "@nestjs/common";
 import {InjectModel} from "@nestjs/mongoose";
 import EventEmitter2 from "eventemitter2";
@@ -23,7 +23,7 @@ export class UserRepository
     super(userDbModel, domainEventBus, userMapper);
   }
 
-  async findOneByUsername(...usernames: string[]): Promise<User> {
+  async findOneByUsername(usernames: string): Promise<User> {
     const doc = await this.dbModel.findOne({
       username: usernames,
     });
@@ -33,9 +33,9 @@ export class UserRepository
 
   async findOneByEmail(...emailAddresses: EmailAddress[]): Promise<User> {
     const doc = await this.dbModel.findOne({
-      $or: emailAddresses.map((emailAddress) => ({
-        emailAddress: emailAddress.address,
-        emailVerified: emailAddress.isVerified,
+      $or: emailAddresses.map(({address, isVerified}) => ({
+        "email.address": address,
+        "email.isVerified": isVerified,
       })),
     });
 
@@ -44,9 +44,9 @@ export class UserRepository
 
   async findOneByPhone(...phoneNumbers: PhoneNumber[]): Promise<User> {
     const doc = await this.dbModel.findOne({
-      $or: phoneNumbers.map((phoneNumber) => ({
-        phoneNumber: phoneNumber.number,
-        phoneVerified: phoneNumber.isVerified,
+      $or: phoneNumbers.map(({number, isVerified}) => ({
+        "phone.number": number,
+        "phone.isVerified": isVerified,
       })),
     });
 

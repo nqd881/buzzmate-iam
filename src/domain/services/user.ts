@@ -1,10 +1,10 @@
 import {IUserProps, User} from "../models";
 import {Password} from "../models/user/password";
-import {PasswordHashingService} from "./password-hashing";
+import {PasswordHashingDomainService} from "./password-hashing";
 
 export class UserDomainService {
   static async create(props: IUserProps) {
-    const hashedPassword = await PasswordHashingService.hashPassword(
+    const hashedPassword = await PasswordHashingDomainService.hashPassword(
       props.password
     );
 
@@ -12,7 +12,7 @@ export class UserDomainService {
   }
 
   static async changePassword(anUser: User, newPassword: Password) {
-    const hashedPassword = await PasswordHashingService.hashPassword(
+    const hashedPassword = await PasswordHashingDomainService.hashPassword(
       newPassword
     );
 

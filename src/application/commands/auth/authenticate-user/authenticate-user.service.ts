@@ -1,12 +1,12 @@
+import {IAuthTokenService} from "@application/ports/interface/auth-token";
 import {EmailAddress} from "@domain/models";
 import {Password} from "@domain/models/user/password";
-import {IUserRepo} from "@domain/repository/user-repo.interface";
+import {IUserRepo} from "@domain/models/user/user-repo.interface";
 import {AuthenDomainService} from "@domain/services/authentication";
 import {Inject} from "@nestjs/common";
 import {CommandHandler, ICommandHandler} from "@nestjs/cqrs";
 import {Repositories} from "src/application/di-tokens/repositories";
 import {Ports} from "src/application/ports/constants";
-import {IJwtService} from "src/application/ports/interface/jwt";
 import {ITfaService} from "src/application/ports/interface/tfa";
 import isEmail from "validator/lib/isEmail";
 import {AuthenticateUserCommand} from "./authenticate-user.command";
@@ -25,7 +25,8 @@ export class AuthenticateUserService implements ICommandHandler {
   constructor(
     @Inject(Repositories.User) private readonly userRepo: IUserRepo,
     @Inject(Ports.TfaService) private readonly tfaService: ITfaService,
-    @Inject(Ports.JwtService) private readonly jwtService: IJwtService
+    @Inject(Ports.AuthTokenService)
+    private readonly authTokenService: IAuthTokenService
   ) {}
 
   private findUser(usernameOrEmail: string) {
@@ -46,7 +47,7 @@ export class AuthenticateUserService implements ICommandHandler {
 
     if (!user.isActive()) throw new Error("User is inactive");
 
-    const authenticated = AuthenDomainService.authenticate(
+    const authenticated = await AuthenDomainService.authenticate(
       user,
       Password.withRaw(password)
     );
@@ -62,8 +63,8 @@ export class AuthenticateUserService implements ICommandHandler {
     }
 
     return {
-      accessToken: this.jwtService.signAccessToken(user),
-      refreshToken: this.jwtService.signRefreshToken(user),
+      accessToken: this.authTokenService.signAccessToken(user),
+      refreshToken: this.authTokenService.signRefreshToken(user),
     };
   }
 }

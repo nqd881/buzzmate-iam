@@ -1,16 +1,16 @@
-import {EmailAddressVerifiedDomainEvent} from "@domain/events/user/email-address-verified";
-import {PasswordChangedDomainEvent} from "@domain/events/user/password-changed";
-import {PersonalInfoInitializedDomainEvent} from "@domain/events/user/personal-info-initialized";
-import {PhoneNumberVerifiedDomainEvent} from "@domain/events/user/phone-number-verified";
-import {TfaTurnedOffDomainEvent} from "@domain/events/user/tfa-turned-off";
-import {TfaTurnedOnDomainEvent} from "@domain/events/user/tfa-turned-on";
-import {UserActivatedDomainEvent} from "@domain/events/user/user-activated";
-import {UserCreatedDomainEvent} from "@domain/events/user/user-created";
-import {UserDisabledDomainEvent} from "@domain/events/user/user-disabled";
 import {EntityId, EntityIdType} from "@libs/ddd";
 import {AggregateRoot} from "@libs/ddd/aggregate-root";
 import {isNil} from "lodash";
 import {EmailAddress} from "./email-address";
+import {EmailAddressVerifiedDomainEvent} from "./events/email-address-verified";
+import {PasswordChangedDomainEvent} from "./events/password-changed";
+import {PersonalInfoInitializedDomainEvent} from "./events/personal-info-initialized";
+import {PhoneNumberVerifiedDomainEvent} from "./events/phone-number-verified";
+import {TfaTurnedOffDomainEvent} from "./events/tfa-turned-off";
+import {TfaTurnedOnDomainEvent} from "./events/tfa-turned-on";
+import {UserActivatedDomainEvent} from "./events/user-activated";
+import {UserCreatedDomainEvent} from "./events/user-created";
+import {UserDisabledDomainEvent} from "./events/user-disabled";
 import {Password} from "./password";
 import {Address} from "./person/address";
 import {BirthDate} from "./person/birthdate";
@@ -51,29 +51,23 @@ export class User extends AggregateRoot<UserId, IUserProps> {
   protected _tfaEnabled: boolean;
   protected _totpSecret: string;
 
-  protected constructor(props: IUserProps, id?: UserId) {
-    super(props, id);
+  constructor(props: IUserProps, version: number, id?: UserId) {
+    super(props, version, id);
   }
 
   static create(props: IUserProps): User {
-    const newUser = new User(props);
+    const newUser = new User(props, 0);
 
     newUser.addEvent(
       new UserCreatedDomainEvent({
-        aggregateId: newUser.id.value,
-        userId: newUser.id.value,
-        name: newUser.person?.name?.fullName,
-        emailAddress: newUser.email.address,
+        aggregateId: newUser.id,
+        userId: newUser.id,
+        name: newUser.person?.name,
+        emailAddress: newUser.email,
       })
     );
 
     return newUser;
-  }
-
-  static from(props: IUserProps, id: UserId): User {
-    if (isNil(id)) throw new Error("The id may not be null");
-
-    return new User(props, id);
   }
 
   protected init() {
@@ -98,8 +92,8 @@ export class User extends AggregateRoot<UserId, IUserProps> {
   }
 
   protected setPhone(aPhone: PhoneNumber) {
-    if (isNil(aPhone))
-      throw new Error("The phone number may not be set to null");
+    // if (isNil(aPhone))
+    //   throw new Error("The phone number may not be set to null");
 
     this._phone = aPhone;
   }
@@ -192,8 +186,8 @@ export class User extends AggregateRoot<UserId, IUserProps> {
 
     this.addEvent(
       new PersonalInfoInitializedDomainEvent({
-        aggregateId: this.id.value,
-        userId: this.id.value,
+        aggregateId: this.id,
+        userId: this.id,
       })
     );
   }
@@ -223,8 +217,8 @@ export class User extends AggregateRoot<UserId, IUserProps> {
 
     this.addEvent(
       new PasswordChangedDomainEvent({
-        aggregateId: this._id.value,
-        userId: this.id.value,
+        aggregateId: this._id,
+        userId: this.id,
       })
     );
   }
@@ -240,9 +234,9 @@ export class User extends AggregateRoot<UserId, IUserProps> {
 
     this.addEvent(
       new EmailAddressVerifiedDomainEvent({
-        aggregateId: this.id.value,
-        userId: this.id.value,
-        emailAddress: this.email.address,
+        aggregateId: this.id,
+        userId: this.id,
+        emailAddress: this.email,
       })
     );
 
@@ -256,9 +250,9 @@ export class User extends AggregateRoot<UserId, IUserProps> {
 
     this.addEvent(
       new PhoneNumberVerifiedDomainEvent({
-        aggregateId: this.id.value,
-        userId: this.id.value,
-        phoneNumber: this.phone.number,
+        aggregateId: this.id,
+        userId: this.id,
+        phoneNumber: this.phone,
       })
     );
 
@@ -275,8 +269,10 @@ export class User extends AggregateRoot<UserId, IUserProps> {
 
     this.addEvent(
       new UserActivatedDomainEvent({
-        aggregateId: this.id.value,
-        userId: this.id.value,
+        aggregateId: this.id,
+        userId: this.id,
+        emailAddress: this.email,
+        name: this.person.name,
       })
     );
   }
@@ -288,8 +284,8 @@ export class User extends AggregateRoot<UserId, IUserProps> {
 
     this.addEvent(
       new UserDisabledDomainEvent({
-        aggregateId: this.id.value,
-        userId: this.id.value,
+        aggregateId: this.id,
+        userId: this.id,
       })
     );
   }
@@ -305,8 +301,8 @@ export class User extends AggregateRoot<UserId, IUserProps> {
 
     this.addEvent(
       new TfaTurnedOnDomainEvent({
-        aggregateId: this.id.value,
-        userId: this.id.value,
+        aggregateId: this.id,
+        userId: this.id,
       })
     );
   }
@@ -318,8 +314,8 @@ export class User extends AggregateRoot<UserId, IUserProps> {
 
     this.addEvent(
       new TfaTurnedOffDomainEvent({
-        aggregateId: this.id.value,
-        userId: this.id.value,
+        aggregateId: this.id,
+        userId: this.id,
       })
     );
   }

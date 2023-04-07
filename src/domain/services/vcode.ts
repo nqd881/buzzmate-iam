@@ -18,12 +18,15 @@ export class VCodeDomainService {
     const now = new Date();
 
     return (userId: UserId) =>
-      new VCode({
-        userId,
-        value: new VCodeValue({type, content: codeProducer()}),
-        attemptLimit,
-        attemptCount: 0,
-        expiredAt: now.getTime() + ms(time),
-      });
+      new VCode(
+        {
+          userId,
+          value: new VCodeValue({type, content: codeProducer()}),
+          attemptLimit,
+          attemptCount: 0,
+          expiredAt: now.getTime() + ms(time),
+        },
+        0
+      );
   }
 }

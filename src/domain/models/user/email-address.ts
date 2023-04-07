@@ -1,4 +1,6 @@
 import {ValueObject, ValueObjectProps} from "@libs/ddd/value-object";
+import {isEmail} from "class-validator";
+import {isNil} from "lodash";
 
 export interface IEmailAddressProps {
   address: string;
@@ -10,7 +12,15 @@ export class EmailAddress extends ValueObject<IEmailAddressProps> {
     super(props);
   }
 
-  validate() {}
+  protected validate(props: ValueObjectProps<IEmailAddressProps>) {
+    const {address, isVerified} = props;
+
+    if (isNil(isVerified))
+      throw new Error("[EmailAddress] isVerified cannot be null");
+
+    if (!isEmail(address))
+      throw new Error("[EmailAddress] Invalid email format");
+  }
 
   static withUnverified(address: string) {
     return new EmailAddress({address, isVerified: false});

@@ -1,14 +1,15 @@
 import {User} from "../models";
 import {Password} from "../models/user/password";
-import {PasswordHashingService} from "./password-hashing";
+import bcrypt from "bcrypt";
 
 export class AuthenDomainService {
   static async authenticate(
     anUser: User,
     aPassword: Password
   ): Promise<boolean> {
-    const hashedPassword = await PasswordHashingService.hashPassword(aPassword);
+    if (aPassword.isHashed)
+      throw new Error("Cannot pass hashed password to authenticate");
 
-    return anUser.password.equals(hashedPassword);
+    return bcrypt.compare(aPassword.value, anUser.password.value);
   }
 }

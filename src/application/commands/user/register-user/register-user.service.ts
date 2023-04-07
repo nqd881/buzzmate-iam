@@ -6,7 +6,7 @@ import {
   UserStatus,
 } from "@domain/models";
 import {Password} from "@domain/models/user/password";
-import {IUserRepo} from "@domain/repository/user-repo.interface";
+import {IUserRepo} from "@domain/models/user/user-repo.interface";
 import {UserDomainService} from "@domain/services/user";
 import {Inject} from "@nestjs/common";
 import {CommandHandler, ICommandHandler} from "@nestjs/cqrs";
@@ -50,7 +50,7 @@ export class RegisterUserService implements ICommandHandler {
       username,
       password: Password.withRaw(password),
       email: EmailAddress.withUnverified(emailAddress),
-      phone: PhoneNumber.withUnverified(phoneNumber),
+      phone: phoneNumber ? PhoneNumber.withUnverified(phoneNumber) : null,
       person: null,
       status: UserStatus.DISABLED,
       tfaEnabled: false,

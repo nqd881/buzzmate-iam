@@ -8,14 +8,10 @@ export class ResetPasswordController {
   constructor(private readonly commandBus: CommandBus) {}
 
   @Post("password_reset")
-  async resetPassword(
-    @Query("user_id") userId: string,
-    @Query("code") code: string,
-    @Body() body: ResetPasswordRequestDto
-  ) {
-    const {newPassword} = body;
+  async resetPassword(@Body() body: ResetPasswordRequestDto) {
+    const {emailAddress, code, newPassword} = body;
 
-    const command = new ResetPasswordCommand({userId, code, newPassword});
+    const command = new ResetPasswordCommand({emailAddress, code, newPassword});
 
     await this.commandBus.execute(command);
 

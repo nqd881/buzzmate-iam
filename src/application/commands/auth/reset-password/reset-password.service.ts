@@ -1,6 +1,6 @@
-import {UserId} from "@domain/models";
+import {EmailAddress, UserId} from "@domain/models";
 import {Password} from "@domain/models/user/password";
-import {IUserRepo} from "@domain/repository/user-repo.interface";
+import {IUserRepo} from "@domain/models/user/user-repo.interface";
 import {UserDomainService} from "@domain/services/user";
 import {Inject} from "@nestjs/common";
 import {CommandHandler, ICommandHandler} from "@nestjs/cqrs";
@@ -21,21 +21,23 @@ export class ResetPasswordService implements ICommandHandler {
   ) {}
 
   async execute(aCommand: ResetPasswordCommand) {
-    const {userId, code, newPassword} = aCommand;
+    const {emailAddress, code, newPassword} = aCommand;
 
-    const user = await this.userRepo.findOneById(new UserId(userId));
+    const user = await this.userRepo.findOneByEmail(
+      EmailAddress.withVerified(emailAddress)
+    );
 
     if (!user) throw new Error("User not found");
 
     const isCodeValid = await this.verificationTokenService.verify(
       VerificationTokenTypes.RESET_PASSWORD,
-      userId,
+      user.id.value,
       code
     );
-
+          
     if (!isCodeValid) throw new Error("Invalid reset password code");
 
-    UserDomainService.changePassword(user, Password.withRaw(newPassword));
+    await UserDomainService.changePassword(user, Password.withRaw(newPassword));
 
     await this.userRepo.save(user);
   }

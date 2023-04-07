@@ -10,7 +10,7 @@ export class Password extends ValueObject<IPasswordProps> {
     super(props);
   }
 
-  validate() {}
+  protected validate(props: ValueObjectProps<IPasswordProps>) {}
 
   get value() {
     return this.props.value;

@@ -1,6 +1,6 @@
 import {Gender} from "@domain/models";
 import {Type} from "class-transformer";
-import {IsDate, IsEmail, IsString} from "class-validator";
+import {IsDate, IsEmail, IsOptional, IsString} from "class-validator";
 
 export class RegisterUserRequestDto {
   @IsString()
@@ -26,5 +26,6 @@ export class RegisterUserRequestDto {
   readonly emailAddress: string;
 
   @IsString()
+  @IsOptional()
   readonly phoneNumber: string;
 }

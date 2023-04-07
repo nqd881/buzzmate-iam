@@ -5,10 +5,10 @@ import {JwtService} from "./jwt.service";
 @Module({
   providers: [
     {
-      provide: Ports.JwtService,
+      provide: Ports.AuthTokenService,
       useClass: JwtService,
     },
   ],
-  exports: [Ports.JwtService],
+  exports: [Ports.AuthTokenService],
 })
 export class JwtModule {}

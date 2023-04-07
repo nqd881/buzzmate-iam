@@ -1,5 +1,5 @@
 import {BirthDate, UserId} from "@domain/models";
-import {IUserRepo} from "@domain/repository/user-repo.interface";
+import {IUserRepo} from "@domain/models/user/user-repo.interface";
 import {Inject} from "@nestjs/common";
 import {CommandHandler, ICommandHandler} from "@nestjs/cqrs";
 import {Repositories} from "src/application/di-tokens/repositories";

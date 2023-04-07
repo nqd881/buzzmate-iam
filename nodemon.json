@@ -11,5 +11,5 @@
     "**/*.ts"
   ],
   "exec": "npm run start:dev --watch",
-  "ext": "js,json,html,css,hbs"
+  "ext": "js,json,html,css,hbs,key"
 }

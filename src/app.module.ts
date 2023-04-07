@@ -1,6 +1,9 @@
+import {EnvNames} from "@infrastructure/env/env.name";
+import {DomainEventBusModule} from "@infrastructure/modules/extra-modules/domain-event-bus/domain-event-bus.module";
+import {RabbitMQEventBusModule} from "@infrastructure/modules/extra-modules/rabbitmq-event-bus/rabbitmq-event-bus.module";
 import {RedisModule} from "@liaoliaots/nestjs-redis";
 import {Module} from "@nestjs/common";
-import {ConfigModule} from "@nestjs/config";
+import {ConfigModule, ConfigService} from "@nestjs/config";
 import {CqrsModule} from "@nestjs/cqrs";
 import {EventEmitterModule} from "@nestjs/event-emitter";
 import {MongooseModule} from "@nestjs/mongoose";
@@ -11,18 +14,34 @@ import {UserModule} from "./infrastructure/modules/user/user.module";
   imports: [
     EventEmitterModule.forRoot(),
     CqrsModule,
-    MongooseModule.forRoot(
-      "mongodb+srv://admin:anchuoicanai@chatssy.lgekg.mongodb.net/?retryWrites=true&w=majority"
-    ),
     ConfigModule.forRoot({
-      envFilePath: "src/infrastructure/env/.dev.env",
+      // envFilePath: "src/infrastructure/env/.dev.env",
       isGlobal: true,
     }),
-    RedisModule.forRoot({
-      config: {
-        url: "redis://localhost:6379",
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (env: ConfigService) => {
+        return {
+          uri: env.get(EnvNames.MONGODB_URI),
+        };
       },
+      inject: [ConfigService],
     }),
+    RedisModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (env: ConfigService) => {
+        return {
+          config: {
+            host: env.get(EnvNames.REDIS_HOST),
+            port: env.get(EnvNames.REDIS_PORT),
+          },
+        };
+      },
+      inject: [ConfigService],
+    }),
+
+    RabbitMQEventBusModule,
+    DomainEventBusModule,
 
     UserModule,
     AuthModule,

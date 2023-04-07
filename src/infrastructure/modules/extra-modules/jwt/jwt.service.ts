@@ -1,65 +1,67 @@
-import {Injectable} from "@nestjs/common";
-import {IJwtService, JwtToken} from "src/application/ports/interface/jwt";
-import jwt from "jsonwebtoken";
-import {ConfigService} from "@nestjs/config";
-import {EnvNames} from "src/infrastructure/env/env.name";
+import {
+  AccessTokenPayload,
+  AuthToken,
+  IAuthTokenService,
+  RefreshTokenPayload,
+} from "@application/ports/interface/auth-token";
 import {User} from "@domain/models";
-
-export interface JwtAccessTokenPayload {
-  userId: string;
-  name: string;
-  emailAddress: string;
-  status: string;
-}
-
-export interface JwtRefreshTokenPayload {
-  userId: string;
-}
+import {Injectable} from "@nestjs/common";
+import fs from "fs";
+import jwt from "jsonwebtoken";
 
 @Injectable()
-export class JwtService
-  implements IJwtService<JwtAccessTokenPayload, JwtRefreshTokenPayload>
-{
-  constructor(private env: ConfigService) {}
+export class JwtService implements IAuthTokenService {
+  private PRIVATE_KEY: Buffer = null;
+  private PUBLIC_KEY: Buffer = null;
 
-  private getAccessTokenPayload(user: User): JwtAccessTokenPayload {
+  constructor() {
+    this.PRIVATE_KEY = fs.readFileSync(
+      "src/infrastructure/env/jwt-keys/private.key"
+    );
+
+    this.PUBLIC_KEY = fs.readFileSync(
+      "src/infrastructure/env/jwt-keys/public.key"
+    );
+  }
+
+  private getAccessTokenPayload(user: User): AccessTokenPayload {
     return {
-      userId: user.id.value,
+      rootUserId: user.id.value,
       name: user.person.name.fullName,
       emailAddress: user.email.address,
       status: user.status,
     };
   }
 
-  private getRefershTokenPayload(user: User): JwtRefreshTokenPayload {
+  private getRefershTokenPayload(user: User): RefreshTokenPayload {
     return {
-      userId: user.id.value,
+      rootUserId: user.id.value,
     };
   }
 
   signAccessToken(user: User) {
     const payload = this.getAccessTokenPayload(user);
 
-    return jwt.sign(payload, this.env.get(EnvNames.JWT_ACCESS_TOKEN_SECRET));
+    return jwt.sign(payload, this.PRIVATE_KEY, {
+      algorithm: "RS256",
+      expiresIn: "1d",
+    });
   }
 
   signRefreshToken(user: User) {
     const payload = this.getRefershTokenPayload(user);
 
-    return jwt.sign(payload, this.env.get(EnvNames.JWT_REFRESH_TOKEN_SECRET));
+    return jwt.sign(payload, this.PRIVATE_KEY, {
+      algorithm: "RS256",
+      expiresIn: "30d",
+    });
   }
 
-  verifyAccessToken(token: JwtToken) {
-    return jwt.verify(
-      token,
-      this.env.get(EnvNames.JWT_ACCESS_TOKEN_SECRET)
-    ) as JwtAccessTokenPayload;
+  verifyAccessToken(token: AuthToken) {
+    return jwt.verify(token, this.PUBLIC_KEY) as AccessTokenPayload;
   }
 
-  verifyRefreshToken(token: any) {
-    return jwt.verify(
-      token,
-      this.env.get(EnvNames.JWT_REFRESH_TOKEN_SECRET)
-    ) as JwtRefreshTokenPayload;
+  verifyRefreshToken(token: AuthToken) {
+    return jwt.verify(token, this.PUBLIC_KEY) as RefreshTokenPayload;
   }
 }

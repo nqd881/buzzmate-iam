@@ -10,7 +10,7 @@ export class Name extends ValueObject<INameProps> {
     super(props);
   }
 
-  validate() {}
+  protected validate(props: ValueObjectProps<INameProps>) {}
 
   get firstName() {
     return this.props.firstName;

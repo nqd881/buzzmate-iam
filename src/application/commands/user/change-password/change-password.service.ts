@@ -1,6 +1,6 @@
 import {UserId} from "@domain/models";
 import {Password} from "@domain/models/user/password";
-import {IUserRepo} from "@domain/repository/user-repo.interface";
+import {IUserRepo} from "@domain/models/user/user-repo.interface";
 import {AuthenDomainService} from "@domain/services/authentication";
 import {UserDomainService} from "@domain/services/user";
 import {Inject} from "@nestjs/common";

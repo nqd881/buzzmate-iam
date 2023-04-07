@@ -14,7 +14,7 @@ export class Address extends ValueObject<IAddressProps> {
     super(props);
   }
 
-  validate() {}
+  protected validate(props: ValueObjectProps<IAddressProps>) {}
 
   get country() {
     return this.props.country;

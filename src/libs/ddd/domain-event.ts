@@ -1,5 +1,6 @@
 import _ from "lodash";
 import {v4 as uuidv4} from "uuid";
+import {EntityId} from "./entity-id";
 
 export interface DomainEventMetadata {
   /** Timestamp when this domain event occurred */
@@ -24,11 +25,11 @@ export type DomainEventProps<T extends DomainEvent<T>> = Omit<
   T,
   "id" | "metadata"
 > & {
-  aggregateId: string;
+  aggregateId: EntityId;
   metadata?: DomainEventMetadata;
 };
 
-export class DomainEvent<T extends DomainEvent<T> = any> {
+export class DomainEvent<T extends DomainEvent<T>> {
   private static get DEFAULT_METADATA(): Partial<DomainEventMetadata> {
     return {
       timestamp: Date.now(),
@@ -36,7 +37,7 @@ export class DomainEvent<T extends DomainEvent<T> = any> {
   }
 
   public readonly id: string;
-  public readonly aggregateId: string;
+  public readonly aggregateId: EntityId;
   public readonly metadata: DomainEventMetadata;
 
   constructor(props: DomainEventProps<T>) {

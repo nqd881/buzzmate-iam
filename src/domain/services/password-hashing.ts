@@ -1,7 +1,7 @@
 import {Password} from "../models/user/password";
 import bcrypt from "bcrypt";
 
-export abstract class PasswordHashingService {
+export abstract class PasswordHashingDomainService {
   private static PASSWORD_SALT_ROUND = 12;
 
   private static hashPlainTextPassword(plainTextPassword: string) {
